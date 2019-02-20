@@ -59,8 +59,8 @@ pub struct ListVisualizationWindow {
 }
 impl ListVisualizationWindow {
     pub fn new(options: ListVisualizationOptions) -> ListVisualizationWindow {
-        let mut framebuffer: Vec<u32> = vec![0; options.width * options.height];
-        let mut window = Window::new("Sort GUI", options.width, options.height,
+        let framebuffer: Vec<u32> = vec![0; options.width * options.height];
+        let window = Window::new("Sort GUI", options.width, options.height,
             WindowOptions::default()).unwrap_or_else(|e| {
                 panic!("{}", e);
             }
