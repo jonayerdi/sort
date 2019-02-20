@@ -15,6 +15,9 @@ use sort::*;
 use sort::bubblesort::*;
 use sort::selectionsort::*;
 
+const WIDTH: usize = 800;
+const HEIGHT: usize = 600;
+
 fn next_step(current_state: &mut ElementList, steps: &Vec<Step>, step_index: usize) {
     if step_index > 0 {
         let previous_step = &steps[step_index-1];
@@ -44,15 +47,10 @@ fn main() {
     let steps = list.steps;
     // Init visualization
     let margin = 2;
-    let options = ListVisualizationOptions::autogenerate(&data, WIDTH, HEIGHT, margin);
-    let mut fb: Vec<u32> = vec![0; WIDTH * HEIGHT];
-    let mut window = Window::new("Sort GUI", WIDTH, HEIGHT,
-        WindowOptions::default()).unwrap_or_else(|e| {
-            panic!("{}", e);
-        }
-    );
+    let visualization_options = ListVisualizationOptions::autogenerate(&data, WIDTH, HEIGHT, margin);
+    let mut window = ListVisualizationWindow::new(visualization_options);
     // Init audio
-    let mut have_audio = audio::try_init_audio();
+    let mut have_audio = try_init_audio();
     // Loop
     let mut current_state = ElementList::new(&mut data);
     let mut step_index = 0;
@@ -60,7 +58,7 @@ fn main() {
     let mut step_begin = Instant::now();
     let refresh_period = Duration::from_millis(0);
     let step_period = Duration::from_millis(0);
-    draw_screen(&mut fb, &options, &current_state, None);
+    window.redraw(&current_state, None);
     while window.is_open() {
         let frame_begin = Instant::now();
         if step_begin.elapsed() > step_period && step_index <= steps.len() {
@@ -76,10 +74,10 @@ fn main() {
             if step_index <= steps.len() {
                 update_indices.extend(steps[step_index-1].indices.iter());
             }
-            draw_screen(&mut fb, &options, &current_state, Some(update_indices));
+            window.redraw(&current_state, Some(update_indices));
             draw_step = step_index;
         }
-        window.update_with_buffer(&fb).unwrap();
+        window.update().unwrap();
         let frame_elapsed = frame_begin.elapsed();
         if refresh_period > frame_elapsed {
             thread::sleep(refresh_period - frame_elapsed);
