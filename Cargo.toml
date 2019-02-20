@@ -1,0 +1,17 @@
+[package]
+name = "sort"
+version = "0.1.0"
+authors = ["Jon Ayerdi <jon_ayerdi_33@hotmail.es>"]
+edition = "2018"
+
+[lib]
+name = "sort"
+path = "src/lib.rs"
+
+[[bin]]
+name = "sortgui"
+path = "src/main.rs"
+
+[dependencies]
+rand = "0.6.5"
+minifb = "0.11.2"
