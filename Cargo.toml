@@ -6,7 +6,7 @@ edition = "2018"
 
 [lib]
 name = "sort"
-path = "src/lib.rs"
+path = "src/sort/lib.rs"
 
 [[bin]]
 name = "sortgui"
@@ -15,3 +15,4 @@ path = "src/main.rs"
 [dependencies]
 rand = "0.6.5"
 minifb = "0.11.2"
+cpal = "0.8.2"
