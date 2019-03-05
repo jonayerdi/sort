@@ -4,6 +4,7 @@ extern crate sort;
 mod graphics;
 mod audio;
 
+use std::env::args;
 use std::thread;
 use std::time::{Duration, Instant};
 use rand::prelude::*;
@@ -17,6 +18,32 @@ use sort::selectionsort::*;
 
 const WIDTH: usize = 800;
 const HEIGHT: usize = 600;
+
+fn parse_args(args: Vec<String>) -> Result<(Box<Fn(&mut List<u32>)>,Vec<u32>),&'static str> {
+    // Select sorting algorithm
+    let sort_fn: Box<Fn(&mut List<u32>)> = match args.get(1) {
+        Some(arg) => match arg.as_str() {
+            "bubblesort" => Box::new(&bubblesort),
+            "selectionsort" => Box::new(&selectionsort),
+            _ => return Err("Unknown sorting algorithm in first parameter"),
+        }
+        None => return Err("Missing first parameter: Sorting algorithm"),
+    };
+    // Generate data
+    if let Some(arg) = args.get(2) {
+        if let Ok(datalength) = arg.parse::<usize>() {
+            let mut data = Vec::with_capacity(datalength);
+            for _ in 0..datalength {
+                data.push(random::<u32>());
+            }
+            Ok((sort_fn, data))
+        } else {
+            Err("Invalid second parameter: Cannot parse data size as number")
+        }
+    } else {
+        Err("Missing second parameter: Data size")
+    }
+}
 
 fn next_step(current_state: &mut ElementList, steps: &Vec<Step>, step_index: usize) {
     if step_index > 0 {
@@ -35,15 +62,23 @@ fn next_step(current_state: &mut ElementList, steps: &Vec<Step>, step_index: usi
 }
 
 fn main() {
-    // Generate data
-    let mut data = [0; 100];
-    for i in 0..data.len() {
-        data[i] = random::<u32>();
+    // Data
+    let sort_fn;
+    let mut data;
+    // Parse args
+    match parse_args(args().collect()) {
+        Ok((func, dat)) => {
+            sort_fn = func;
+            data = dat;
+        },
+        Err(msg) => {
+            panic!(format!("Error parsing arguments -> {}", msg));
+        }
     }
     // Clone and sort
     let mut data2 = data.clone();
     let mut list = RecorderList::new(&mut data2);
-    bubblesort(&mut list);
+    sort_fn(&mut list);
     let steps = list.steps;
     // Init visualization
     let margin = 2;
