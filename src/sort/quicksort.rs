@@ -7,7 +7,7 @@ fn relocate_pivot_right<T>(list: &mut List<T>, pivot: usize, right: usize) -> us
 where T: Ord
 {
     let mut pivot = pivot;
-    loop {
+    while pivot < right {
         let mut swapped = false;
         for i in 1..=right - pivot {
             if list.compare(pivot, pivot + i) == Ordering::Greater {
@@ -29,7 +29,7 @@ fn relocate_pivot_left<T>(list: &mut List<T>, left: usize, pivot: usize) -> usiz
 where T: Ord
 {
     let mut pivot = pivot;
-    loop {
+    while left < pivot {
         let mut swapped = false;
         for i in (1..=pivot - left).rev() {
             if list.compare(pivot - i, pivot) == Ordering::Greater {
@@ -72,7 +72,7 @@ where T: Ord
 fn partition<T>(list: &mut List<T>, begin: usize, end: usize) -> usize
 where T: Ord
 {
-    let pivot: usize = random::<usize>() % (end+1-begin);
+    let pivot = (random::<usize>() % (end+1-begin)) + begin;
     // Swap large elements to the left with small ones to the right
     let remaining = swap_from_sides(list, begin, pivot, end);
     // Move remaining elements left or right and reposition pivot element
@@ -89,12 +89,19 @@ where T: Ord
     if begin < end {
         // Partition elements
         let pivot = partition(list, begin, end);
+        // Calculate element count on each side of the pivot
+        let left_length = pivot-begin;
+        let right_length = end-pivot;
         // Recursion (tail call to the largest partition)
-        if pivot-begin <= end-pivot {
-            real_quicksort(list, begin, pivot-1);
+        if left_length <= right_length {
+            if left_length > 0 {
+                real_quicksort(list, begin, pivot-1);
+            }
             real_quicksort(list, pivot+1, end);
         } else {
-            real_quicksort(list, pivot+1, end);
+            if right_length > 0 {
+                real_quicksort(list, pivot+1, end);
+            }
             real_quicksort(list, begin, pivot-1);
         }
     }
@@ -105,4 +112,18 @@ where T: Ord
 {
     let length = list.len();
     real_quicksort(list, 0, length-1);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use super::super::BasicList;
+    #[test]
+    fn test_quicksort() {
+        let mut test_slice = [1,4,123,7,8,4,2,4,57,8,324,213];
+        let mut list = BasicList::new(&mut test_slice);
+        let remain = swap_from_sides(&mut list, 0, 4, 11);
+        println!("{}", remain);
+        println!("{:?}", test_slice);
+    }
 }

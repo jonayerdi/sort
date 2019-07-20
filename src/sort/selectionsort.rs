@@ -22,7 +22,7 @@ mod tests {
     use super::*;
     use super::super::BasicList;
     #[test]
-    fn test() {
+    fn test_selectionsort() {
         let mut test_slice = [1,4,123,7,8,4,2,4,57,8,324,213];
         let mut test_slice2 = test_slice.clone();
         let mut list = BasicList::new(&mut test_slice2);

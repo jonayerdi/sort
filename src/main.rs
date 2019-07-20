@@ -88,8 +88,8 @@ fn main() {
     let mut step_index = 0;
     let mut draw_step = 0;
     let mut step_begin = Instant::now();
-    let refresh_period = Duration::from_millis(0);
-    let step_period = Duration::from_millis(0);
+    let refresh_period = Duration::from_millis(5);
+    let step_period = Duration::from_millis(5);
     window.redraw(&current_state, None);
     while window.is_open() {
         let frame_begin = Instant::now();
@@ -114,6 +114,6 @@ fn main() {
         if refresh_period > frame_elapsed {
             thread::sleep(refresh_period - frame_elapsed);
         }
-        println!("{}", frame_begin.elapsed().subsec_millis());
+        //println!("{}", frame_begin.elapsed().subsec_millis());
     }
 }
