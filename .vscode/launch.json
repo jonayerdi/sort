@@ -9,7 +9,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/sortgui.exe",
-            "args": ["bubblesort","10"],
+            "args": ["quicksort","10"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

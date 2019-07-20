@@ -1,20 +1,18 @@
 extern crate rand;
 extern crate sort;
 
-mod graphics;
-mod audio;
-
 use std::env::args;
 use std::thread;
 use std::time::{Duration, Instant};
 use rand::prelude::*;
 
+mod graphics;
 use self::graphics::*;
-use self::audio::*;
 
 use sort::*;
 use sort::bubblesort::*;
 use sort::selectionsort::*;
+use sort::quicksort::*;
 
 const WIDTH: usize = 800;
 const HEIGHT: usize = 600;
@@ -25,6 +23,7 @@ fn parse_args(args: Vec<String>) -> Result<(Box<Fn(&mut List<u32>)>,Vec<u32>),&'
         Some(arg) => match arg.as_str() {
             "bubblesort" => Box::new(&bubblesort),
             "selectionsort" => Box::new(&selectionsort),
+            "quicksort" => Box::new(&quicksort),
             _ => return Err("Unknown sorting algorithm in first parameter"),
         }
         None => return Err("Missing first parameter: Sorting algorithm"),
@@ -84,8 +83,6 @@ fn main() {
     let margin = 2;
     let visualization_options = ListVisualizationOptions::autogenerate(&data, WIDTH, HEIGHT, margin);
     let mut window = ListVisualizationWindow::new(visualization_options);
-    // Init audio
-    let mut have_audio = try_init_audio();
     // Loop
     let mut current_state = ElementList::new(&mut data);
     let mut step_index = 0;
