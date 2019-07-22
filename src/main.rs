@@ -13,6 +13,7 @@ use sort::*;
 use sort::bubblesort::*;
 use sort::selectionsort::*;
 use sort::quicksort::*;
+use sort::quicksort2::*;
 
 const WIDTH: usize = 800;
 const HEIGHT: usize = 600;
@@ -24,6 +25,7 @@ fn parse_args(args: Vec<String>) -> Result<(Box<Fn(&mut List<u32>)>,Vec<u32>),&'
             "bubblesort" => Box::new(&bubblesort),
             "selectionsort" => Box::new(&selectionsort),
             "quicksort" => Box::new(&quicksort),
+            "quicksort2" => Box::new(&quicksort2),
             _ => return Err("Unknown sorting algorithm in first parameter"),
         }
         None => return Err("Missing first parameter: Sorting algorithm"),
