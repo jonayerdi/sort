@@ -9,7 +9,7 @@ use std::time::Duration;
 use std::thread;
 use std::marker::Send;
 
-pub fn play<'a,T>(data: Vec<T>, mut window: ListVisualizationWindow<T>) 
+pub fn play<'a,T>(data: Vec<T>, window: ListVisualizationWindow<T>) 
 where T: 'static + Copy + Ord  + Into<f64> + Send + std::fmt::Display
 {
     // Make update channel for Window

@@ -71,7 +71,6 @@ where T: Copy + Ord + Into<f64> + std::fmt::Display
     }
 }
 
-#[derive(Clone)]
 pub struct ListUpdate<T>
 where T: Copy + Ord + Into<f64> + std::fmt::Display
 {
@@ -107,15 +106,13 @@ where T: Copy + Ord + Into<f64> + std::fmt::Display
             revert_changes: Vec::with_capacity(4),
         }
     }
-    pub fn update(&mut self, mut changes: Vec<ListUpdate<T>>) -> minifb::Result<()> {
-        // Sort changes by index
-        changes.sort_unstable_by(|a,b| a.index.cmp(&b.index));
-        // Clone previous changes to revert into new buffer + clear old buffer
-        let mut revert_changes_previous = self.revert_changes.clone();
-        self.revert_changes.clear();
+    pub fn update(&mut self, changes: Vec<ListUpdate<T>>) -> minifb::Result<()> {
+        // Alloc new buffer for changes to revert later
+        let mut revert_changes_previous = Vec::with_capacity(4);
+        std::mem::swap(&mut revert_changes_previous, &mut self.revert_changes);
         for change in changes.iter() {
             // Ignore previous changes to revert if same index is in current changes
-            if let Ok(to_remove) = revert_changes_previous.binary_search_by(|x| x.index.cmp(&change.index)) {
+            if let Some(to_remove) = revert_changes_previous.iter().position(|x| x.index == change.index) {
                 revert_changes_previous.remove(to_remove);
             }
             // Store next changes to revert
