@@ -12,8 +12,10 @@ use std::marker::Send;
 pub fn play<'a,T>(data: Vec<T>, mut window: ListVisualizationWindow<T>) 
 where T: 'static + Copy + Ord  + Into<f64> + Send + std::fmt::Display
 {
+    // Make update channel for Window
+    let channel = window.make_update_channel();
     // Display initial slice
-    window.update(data.iter().enumerate()
+    channel.send(data.iter().enumerate()
         .map(move |(i,&e)| ListUpdate {
             index: i,
             value: e,
@@ -21,14 +23,13 @@ where T: 'static + Copy + Ord  + Into<f64> + Send + std::fmt::Display
         }).collect()
     ).unwrap();
     // Call the sorting function
-    let channel = window.make_update_channel();
     thread::spawn(move || {
         let mut data = data;
         let mut list = CallbackList::new(&mut data, make_callback(channel));
         sort::quicksort2::quicksort2(&mut list);
     });
     // Execute window loop
-    window.update_loop(Duration::from_millis(5));
+    window.update_loop(Duration::from_millis(10));
 }
 
 fn make_callback<T>(updater: SyncSender<Vec<ListUpdate<T>>>) -> Box<Fn(Operation,&[T]) + Send>

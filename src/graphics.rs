@@ -71,7 +71,6 @@ where T: Copy + Ord + Into<f64> + std::fmt::Display
     }
 }
 
-#[derive(Clone,Copy)]
 pub struct ListUpdate<T>
 where T: Copy + Ord + Into<f64> + std::fmt::Display
 {
@@ -106,7 +105,7 @@ where T: Copy + Ord + Into<f64> + std::fmt::Display
         }
     }
     pub fn update(&mut self, changes: Vec<ListUpdate<T>>) -> minifb::Result<()> {
-        self.visualization.draw(changes.iter().map(|x| *x), &mut self.framebuffer);
+        self.visualization.draw(changes.into_iter(), &mut self.framebuffer);
         self.window.update_with_buffer(&self.framebuffer)
     }
     pub fn update_loop(&mut self, refresh_period: Duration) {
