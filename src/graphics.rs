@@ -71,6 +71,7 @@ where T: Copy + Ord + Into<f64> + std::fmt::Display
     }
 }
 
+#[derive(Clone)]
 pub struct ListUpdate<T>
 where T: Copy + Ord + Into<f64> + std::fmt::Display
 {
@@ -82,10 +83,11 @@ where T: Copy + Ord + Into<f64> + std::fmt::Display
 pub struct ListVisualizationWindow<T> 
 where T: Copy + Ord + Into<f64> + std::fmt::Display
 {
-    pub window: Window,
-    pub channel: (SyncSender<Vec<ListUpdate<T>>>, Receiver<Vec<ListUpdate<T>>>),
-    pub visualization: ListVisualization<T>,
-    pub framebuffer: Vec<u32>,
+    window: Window,
+    channel: (SyncSender<Vec<ListUpdate<T>>>, Receiver<Vec<ListUpdate<T>>>),
+    visualization: ListVisualization<T>,
+    framebuffer: Vec<u32>,
+    revert_changes: Vec<ListUpdate<T>>,
 }
 impl<T> ListVisualizationWindow<T>  
 where T: Copy + Ord + Into<f64> + std::fmt::Display
@@ -102,21 +104,47 @@ where T: Copy + Ord + Into<f64> + std::fmt::Display
             channel,
             framebuffer: vec![0; visualization.width * visualization.height],
             visualization,
+            revert_changes: Vec::with_capacity(4),
         }
     }
-    pub fn update(&mut self, changes: Vec<ListUpdate<T>>) -> minifb::Result<()> {
-        self.visualization.draw(changes.into_iter(), &mut self.framebuffer);
+    pub fn update(&mut self, mut changes: Vec<ListUpdate<T>>) -> minifb::Result<()> {
+        // Sort changes by index
+        changes.sort_unstable_by(|a,b| a.index.cmp(&b.index));
+        // Clone previous changes to revert into new buffer + clear old buffer
+        let mut revert_changes_previous = self.revert_changes.clone();
+        self.revert_changes.clear();
+        for change in changes.iter() {
+            // Ignore previous changes to revert if same index is in current changes
+            if let Ok(to_remove) = revert_changes_previous.binary_search_by(|x| x.index.cmp(&change.index)) {
+                revert_changes_previous.remove(to_remove);
+            }
+            // Store next changes to revert
+            if [COLOR_READ, COLOR_WRITE].contains(&change.color) {
+                self.revert_changes.push(ListUpdate { 
+                    index: change.index, 
+                    value: change.value, 
+                    color: COLOR_FILL,
+                });
+            }
+        }
+        // Merge previous changes to revert and new changes
+        let all_changes = revert_changes_previous.into_iter().chain(changes.into_iter());
+        // Redraw changed elements on the framebuffer and update window
+        self.visualization.draw(all_changes, &mut self.framebuffer);
         self.window.update_with_buffer(&self.framebuffer)
     }
-    pub fn update_loop(&mut self, refresh_period: Duration) {
+    pub fn update_loop(mut self, refresh_period: Duration) {
+        // Loop until Window is closed
         while self.is_open() {
+            // Store instant when cycle begins
             let before = Instant::now();
-            if let Ok(next_update) = self.channel.1.try_recv() {
-                self.update(next_update).unwrap();
-            } else {
-                // Need to call this periodically for the Window to remain responsive
-                self.window.update_with_buffer(&self.framebuffer).unwrap();
-            }
+            // Receive list updates to visualize via self.channel
+            let next_update = if let Ok(next_update) = self.channel.1.try_recv() {
+                next_update
+            } else { vec![] };
+            // Need to call self.update periodically for the Window to remain responsive
+            self.update(next_update).unwrap();
+            // Sleep for the remaining time of the cycle
             let elapsed = Instant::now() - before;
             if elapsed < refresh_period {
                 sleep(refresh_period - elapsed);
