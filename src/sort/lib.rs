@@ -7,15 +7,19 @@ pub mod heapsort;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum Operation {
-    Compare,
-    Swap,
+    Get(usize),
+    Set(usize),
+    Compare(usize,usize),
+    Swap(usize,usize),
 }
 impl std::fmt::Display for Operation {
     fn fmt (&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        write!(f, "{}", match self {
-            Operation::Compare => "Compare",
-            Operation::Swap => "Swap",
-        })
+        match self {
+            Operation::Get(index) => write!(f, "Get[{}]", index),
+            Operation::Set(index) => write!(f, "Set[{}]", index),
+            Operation::Compare(index1, index2) => write!(f, "Compare[{}][{}]", index1, index2),
+            Operation::Swap(index1, index2) => write!(f, "Swap[{}][{}]", index1, index2),
+        }
     }
 }
 impl std::fmt::Debug for Operation {
@@ -24,70 +28,79 @@ impl std::fmt::Debug for Operation {
     }
 }
 
-pub struct Step {
-    pub operation: Operation,
-    pub indices: [usize; 2],
-}
-impl std::fmt::Display for Step {
-    fn fmt (&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        write!(f, "{}({},{})", self.operation, self.indices[0], self.indices[1])
-    }
-}
-impl std::fmt::Debug for Step {
-    fn fmt (&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        write!(f, "{}", self)
-    }
-}
-
-pub trait List<T> {
+pub trait List<T> 
+where T: Copy + Ord 
+{
     fn len(&self) -> usize;
-    fn compare(&mut self, a: usize, b: usize)  -> std::cmp::Ordering where T: Ord;
+    fn get(&self, index: usize) -> T;
+    fn set(&mut self, index: usize, value: T);
+    fn compare(&self, a: usize, b: usize)  -> std::cmp::Ordering;
     fn swap(&mut self, a: usize, b: usize);
 }
 
-pub struct BasicList<'a,T> {
-    pub slice: &'a mut [T],
-}
-impl<'a,T> BasicList<'a,T> {
-    pub fn new(slice: &mut [T]) -> BasicList<T> {
-        BasicList { slice }
-    }
-}
-impl<'a,T> List<T> for BasicList<'a,T> {
+impl<T> List<T> for Vec<T>
+where T: Copy + Ord
+{
     fn len(&self) -> usize {
-        self.slice.len()
+        self.len()
     }
-    fn compare(&mut self, a: usize, b: usize)  -> std::cmp::Ordering
-    where T: Ord
-    {
-        self.slice[a].cmp(&self.slice[b])
+    fn get(&self, index: usize) -> T {
+        self[index]
+    }
+    fn set(&mut self, index: usize, value: T) {
+        self[index] = value;
+    }
+    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering {
+        self[a].cmp(&self[b])
     }
     fn swap(&mut self, a: usize, b: usize) {
-        self.slice.swap(a, b);
+        // Copypasted from Vec::swap
+        unsafe {
+            // Can't take two mutable loans from one vector, so instead just cast
+            // them to their raw pointers to do the swap
+            let pa: *mut T = &mut self[a];
+            let pb: *mut T = &mut self[b];
+            std::ptr::swap(pa, pb);
+        }
     }
 }
 
-pub struct RecorderList<'a,T> {
+pub struct CallbackList<'a,T>
+where T: Copy + Ord
+{
     pub slice: &'a mut [T],
-    pub steps: Vec<Step>,
+    pub callback: Box<Fn(Operation,&[T])>,
 }
-impl<'a,T> RecorderList<'a,T> {
-    pub fn new(slice: &mut [T]) -> RecorderList<T> {
-        RecorderList { slice, steps: Vec::new() }
+impl<'a,T> CallbackList<'a,T>
+where T: Copy + Ord
+{
+    pub fn new(slice: &'a mut [T], callback: Box<Fn(Operation,&[T])>) -> CallbackList<'a,T> {
+        CallbackList { slice, callback }
     }
 }
-impl<'a,T> List<T> for RecorderList<'a,T> {
+impl<'a,T> List<T> for CallbackList<'a,T>
+where T: Copy + Ord
+{
     fn len(&self) -> usize {
         self.slice.len()
     }
-    fn compare(&mut self, a: usize, b: usize)  -> std::cmp::Ordering
-    where T: Ord
+    fn get(&self, index: usize) -> T {
+        let result = self.slice[index];
+        (self.callback)(Operation::Get(index), self.slice);
+        result
+    }
+    fn set(&mut self, index: usize, value: T) {
+        self.slice[index] = value;
+        (self.callback)(Operation::Set(index), self.slice);
+    }
+    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering
     {
-        self.steps.push(Step { operation: Operation::Compare, indices: [a,b] });
-        self.slice[a].cmp(&self.slice[b])
+        let result = self.slice[a].cmp(&self.slice[b]);
+        (self.callback)(Operation::Compare(a,b), self.slice);
+        result
     }
     fn swap(&mut self, a: usize, b: usize) {
-        self.steps.push(Step { operation: Operation::Swap, indices: [a,b] });
         self.slice.swap(a, b);
+        (self.callback)(Operation::Swap(a,b), self.slice);
     }
 }

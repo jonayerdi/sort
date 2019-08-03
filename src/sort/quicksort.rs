@@ -4,7 +4,7 @@ use super::List;
 use rand::prelude::*;
 
 fn relocate_pivot_right<T>(list: &mut List<T>, pivot: usize, right: usize) -> usize
-where T: Ord
+where T: Copy + Ord + std::fmt::Display
 {
     let mut pivot = pivot;
     while pivot < right {
@@ -26,7 +26,7 @@ where T: Ord
 }
 
 fn relocate_pivot_left<T>(list: &mut List<T>, left: usize, pivot: usize) -> usize
-where T: Ord
+where T: Copy + Ord + std::fmt::Display
 {
     let mut pivot = pivot;
     while left < pivot {
@@ -48,7 +48,7 @@ where T: Ord
 }
 
 fn swap_from_sides<T>(list: &mut List<T>, begin: usize, pivot: usize, end: usize) -> usize
-where T: Ord
+where T: Copy + Ord + std::fmt::Display
 {
     let mut left = begin;
     let mut right = end;
@@ -70,7 +70,7 @@ where T: Ord
 }
 
 fn partition<T>(list: &mut List<T>, begin: usize, end: usize) -> usize
-where T: Ord
+where T: Copy + Ord + std::fmt::Display
 {
     let pivot = (random::<usize>() % (end+1-begin)) + begin;
     // Swap large elements to the left with small ones to the right
@@ -84,7 +84,7 @@ where T: Ord
 }
 
 fn real_quicksort<T>(list: &mut List<T>, begin: usize, end: usize)
-where T: Ord
+where T: Copy + Ord + std::fmt::Display
 {
     if begin < end {
         // Partition elements
@@ -108,7 +108,7 @@ where T: Ord
 }
 
 pub fn quicksort<T>(list: &mut List<T>)
-where T: Ord
+where T: Copy + Ord + std::fmt::Display
 {
     let length = list.len();
     real_quicksort(list, 0, length-1);
@@ -117,13 +117,14 @@ where T: Ord
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::BasicList;
     #[test]
     fn test_quicksort() {
-        let mut test_slice = [1,4,123,7,8,4,2,4,57,8,324,213];
-        let mut list = BasicList::new(&mut test_slice);
-        let remain = swap_from_sides(&mut list, 0, 4, 11);
-        println!("{}", remain);
-        println!("{:?}", test_slice);
+        let mut test_slice = vec![1,4,123,7,8,4,2,4,57,8,324,213];
+        let mut test_slice2 = test_slice.clone();
+        assert_eq!(test_slice, test_slice2);
+        test_slice.sort_unstable();
+        quicksort(&mut test_slice2);
+        assert_eq!(test_slice, test_slice2);
+        println!("{:?}", test_slice2);
     }
 }

@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use super::List;
 
 pub fn selectionsort<T>(list: &mut List<T>)
-where T: Ord
+where T: Copy + Ord + std::fmt::Display
 {
     for index1 in 0..list.len() {
         let mut min_index = index1;
@@ -20,16 +20,14 @@ where T: Ord
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::BasicList;
     #[test]
     fn test_selectionsort() {
-        let mut test_slice = [1,4,123,7,8,4,2,4,57,8,324,213];
+        let mut test_slice = vec![1,4,123,7,8,4,2,4,57,8,324,213];
         let mut test_slice2 = test_slice.clone();
-        let mut list = BasicList::new(&mut test_slice2);
-        assert_eq!(test_slice, list.slice);
+        assert_eq!(test_slice, test_slice2);
         test_slice.sort_unstable();
-        selectionsort(&mut list);
-        assert_eq!(test_slice, list.slice);
-        println!("{:?}", list.slice);
+        selectionsort(&mut test_slice2);
+        assert_eq!(test_slice, test_slice2);
+        println!("{:?}", test_slice2);
     }
 }

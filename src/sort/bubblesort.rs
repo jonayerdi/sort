@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use super::List;
 
 pub fn bubblesort<T>(list: &mut List<T>)
-where T: Ord
+where T: Copy + Ord + std::fmt::Display
 {
     let mut swapped = true;
     let mut iterations = 0;
@@ -21,16 +21,14 @@ where T: Ord
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::BasicList;
     #[test]
     fn test_bubblesort() {
-        let mut test_slice = [1,4,123,7,8,4,2,4,57,8,324,213];
+        let mut test_slice = vec![1,4,123,7,8,4,2,4,57,8,324,213];
         let mut test_slice2 = test_slice.clone();
-        let mut list = BasicList::new(&mut test_slice2);
-        assert_eq!(test_slice, list.slice);
+        assert_eq!(test_slice, test_slice2);
         test_slice.sort_unstable();
-        bubblesort(&mut list);
-        assert_eq!(test_slice, list.slice);
+        bubblesort(&mut test_slice2);
+        assert_eq!(test_slice, test_slice2);
         println!("{:?}", test_slice2);
     }
 }
