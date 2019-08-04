@@ -20,14 +20,14 @@ const WIDTH: usize = 800;
 const HEIGHT: usize = 600;
 const MARGIN: usize = 2;
 
-fn parse_args(args: Vec<String>) -> Result<(&'static Fn(&mut List<u32>),Vec<u32>),&'static str> {
+fn parse_args(args: Vec<String>) -> Result<(fn(&mut List<u32>),Vec<u32>),&'static str> {
     // Select sorting algorithm
-    let sort_fn: &Fn(&mut List<u32>) = match args.get(1) {
+    let sort_fn = match args.get(1) {
         Some(arg) => match arg.as_str() {
-            "bubblesort" => &bubblesort,
-            "selectionsort" => &selectionsort,
-            "quicksort" => &quicksort,
-            "quicksort2" => &quicksort2,
+            "bubblesort" => bubblesort,
+            "selectionsort" => selectionsort,
+            "quicksort" => quicksort,
+            "quicksort2" => quicksort2,
             _ => return Err("Unknown sorting algorithm in first parameter"),
         }
         None => return Err("Missing first parameter: Sorting algorithm"),
@@ -66,5 +66,5 @@ fn main() {
     let visualization = ListVisualization::autogenerate(&data, WIDTH, HEIGHT, MARGIN);
     let window = ListVisualizationWindow::new(visualization);
     // Run
-    play(data, window);
+    play(sort_fn, data, window);
 }

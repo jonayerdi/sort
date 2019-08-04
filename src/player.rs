@@ -9,8 +9,8 @@ use std::time::Duration;
 use std::thread;
 use std::marker::Send;
 
-pub fn play<'a,T>(data: Vec<T>, window: ListVisualizationWindow<T>) 
-where T: 'static + Copy + Ord  + Into<f64> + Send + std::fmt::Display
+pub fn play<T,F>(sort_fn: F, data: Vec<T>, window: ListVisualizationWindow<T>) 
+where T: 'static + Copy + Ord  + Into<f64> + Send + std::fmt::Display, F: 'static + Fn(&mut List<T>) + Send
 {
     // Make update channel for Window
     let channel = window.make_update_channel();
@@ -26,7 +26,7 @@ where T: 'static + Copy + Ord  + Into<f64> + Send + std::fmt::Display
     thread::spawn(move || {
         let mut data = data;
         let mut list = CallbackList::new(&mut data, make_callback(channel));
-        sort::quicksort2::quicksort2(&mut list);
+        sort_fn(&mut list);
     });
     // Execute window loop
     window.update_loop(Duration::from_millis(10));
