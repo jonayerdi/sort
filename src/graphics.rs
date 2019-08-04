@@ -9,7 +9,8 @@ use std::thread::sleep;
 use minifb::{WindowOptions, Window};
 
 pub const COLOR_BACKGROUND: u32 = 0xFF111111;
-pub const COLOR_FILL: u32 = 0xFF00AA22;
+pub const COLOR_FILL: u32 = 0xFFAAAAAA;
+pub const COLOR_DONE: u32 = 0xFF00AA22;
 pub const COLOR_READ: u32 = 0xFF00AAAA;
 pub const COLOR_WRITE: u32 = 0xFFAA0055;
 

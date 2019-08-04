@@ -24,19 +24,30 @@ where T: 'static + Copy + Ord  + Into<f64> + Send + std::fmt::Display, F: 'stati
     ).unwrap();
     // Call the sorting function
     thread::spawn(move || {
+        // Capture variables + create CallbackList
+        let channel = &channel;
         let mut data = data;
         let mut list = CallbackList::new(&mut data, make_callback(channel));
+        // Call sort function
         sort_fn(&mut list);
+        // Display ending animation
+        data.iter().enumerate().for_each(move |(i,&e)| {
+            channel.send(vec![ListUpdate {
+                index: i,
+                value: e,
+                color: COLOR_DONE,
+            }]).unwrap();
+        });
     });
     // Execute window loop
     window.update_loop(Duration::from_millis(10));
 }
 
-fn make_callback<T>(updater: SyncSender<Vec<ListUpdate<T>>>) -> Box<Fn(Operation,&[T]) + Send>
-where T: 'static + Copy + Ord  + Into<f64> + Send + std::fmt::Display
+fn make_callback<'a,T>(channel: &'a SyncSender<Vec<ListUpdate<T>>>) -> Box<'a + Fn(Operation,&[T]) + Send>
+where T: Copy + Ord  + Into<f64> + Send + std::fmt::Display
 {
     Box::new(move |operation, slice| {
-        updater.send(
+        channel.send(
             match operation {
                 Operation::Get(i) => vec![ListUpdate { index: i, value: slice[i], color: COLOR_READ }],
                 Operation::Set(i) => vec![ListUpdate { index: i, value: slice[i], color: COLOR_WRITE }],

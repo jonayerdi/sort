@@ -65,20 +65,20 @@ where T: Copy + Ord
     }
 }
 
-pub struct CallbackList<'a,T>
+pub struct CallbackList<'a,'b,T>
 where T: Copy + Ord
 {
     pub slice: &'a mut [T],
-    pub callback: Box<Fn(Operation,&[T])>,
+    pub callback: Box<Fn(Operation,&[T]) + 'b>,
 }
-impl<'a,T> CallbackList<'a,T>
+impl<'a,'b,T> CallbackList<'a,'b,T>
 where T: Copy + Ord
 {
-    pub fn new(slice: &'a mut [T], callback: Box<Fn(Operation,&[T])>) -> CallbackList<'a,T> {
+    pub fn new(slice: &'a mut [T], callback: Box<Fn(Operation,&[T]) + 'b>) -> CallbackList<'a,'b,T> {
         CallbackList { slice, callback }
     }
 }
-impl<'a,T> List<T> for CallbackList<'a,T>
+impl<'a,'b,T> List<T> for CallbackList<'a,'b,T>
 where T: Copy + Ord
 {
     fn len(&self) -> usize {
