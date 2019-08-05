@@ -1,10 +1,11 @@
-use std::cmp::Ordering;
 use super::List;
+use std::cmp::Ordering;
 
 use rand::prelude::*;
 
 fn relocate_pivot_right<T>(list: &mut List<T>, pivot: usize, right: usize) -> usize
-where T: Copy + Ord + std::fmt::Display
+where
+    T: Copy + Ord + std::fmt::Display,
 {
     let mut pivot = pivot;
     while pivot < right {
@@ -17,7 +18,7 @@ where T: Copy + Ord + std::fmt::Display
                 swapped = true;
                 break;
             }
-        };
+        }
         if !swapped {
             break;
         }
@@ -26,7 +27,8 @@ where T: Copy + Ord + std::fmt::Display
 }
 
 fn relocate_pivot_left<T>(list: &mut List<T>, left: usize, pivot: usize) -> usize
-where T: Copy + Ord + std::fmt::Display
+where
+    T: Copy + Ord + std::fmt::Display,
 {
     let mut pivot = pivot;
     while left < pivot {
@@ -39,7 +41,7 @@ where T: Copy + Ord + std::fmt::Display
                 swapped = true;
                 break;
             }
-        };
+        }
         if !swapped {
             break;
         }
@@ -48,7 +50,8 @@ where T: Copy + Ord + std::fmt::Display
 }
 
 fn swap_from_sides<T>(list: &mut List<T>, begin: usize, pivot: usize, end: usize) -> usize
-where T: Copy + Ord + std::fmt::Display
+where
+    T: Copy + Ord + std::fmt::Display,
 {
     let mut left = begin;
     let mut right = end;
@@ -66,13 +69,14 @@ where T: Copy + Ord + std::fmt::Display
             right -= 1;
         }
         list.swap(left, right);
-    };
+    }
 }
 
 fn partition<T>(list: &mut List<T>, begin: usize, end: usize) -> usize
-where T: Copy + Ord + std::fmt::Display
+where
+    T: Copy + Ord + std::fmt::Display,
 {
-    let pivot = (random::<usize>() % (end+1-begin)) + begin;
+    let pivot = (random::<usize>() % (end + 1 - begin)) + begin;
     // Swap large elements to the left with small ones to the right
     let remaining = swap_from_sides(list, begin, pivot, end);
     // Move remaining elements left or right and reposition pivot element
@@ -84,34 +88,36 @@ where T: Copy + Ord + std::fmt::Display
 }
 
 fn real_quicksort<T>(list: &mut List<T>, begin: usize, end: usize)
-where T: Copy + Ord + std::fmt::Display
+where
+    T: Copy + Ord + std::fmt::Display,
 {
     if begin < end {
         // Partition elements
         let pivot = partition(list, begin, end);
         // Calculate element count on each side of the pivot
-        let left_length = pivot-begin;
-        let right_length = end-pivot;
+        let left_length = pivot - begin;
+        let right_length = end - pivot;
         // Recursion (tail call to the largest partition)
         if left_length <= right_length {
             if left_length > 0 {
-                real_quicksort(list, begin, pivot-1);
+                real_quicksort(list, begin, pivot - 1);
             }
-            real_quicksort(list, pivot+1, end);
+            real_quicksort(list, pivot + 1, end);
         } else {
             if right_length > 0 {
-                real_quicksort(list, pivot+1, end);
+                real_quicksort(list, pivot + 1, end);
             }
-            real_quicksort(list, begin, pivot-1);
+            real_quicksort(list, begin, pivot - 1);
         }
     }
 }
 
 pub fn quicksort<T>(list: &mut List<T>)
-where T: Copy + Ord + std::fmt::Display
+where
+    T: Copy + Ord + std::fmt::Display,
 {
     let length = list.len();
-    real_quicksort(list, 0, length-1);
+    real_quicksort(list, 0, length - 1);
 }
 
 #[cfg(test)]
@@ -119,7 +125,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_quicksort() {
-        let mut test_slice = vec![1,4,123,7,8,4,2,4,57,8,324,213];
+        let mut test_slice = vec![1, 4, 123, 7, 8, 4, 2, 4, 57, 8, 324, 213];
         let mut test_slice2 = test_slice.clone();
         assert_eq!(test_slice, test_slice2);
         test_slice.sort_unstable();

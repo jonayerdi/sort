@@ -1,26 +1,26 @@
 extern crate rand;
 extern crate sort;
 
-use std::env::args;
 use rand::prelude::*;
+use std::env::args;
 
 mod player;
 use player::play;
 
 mod graphics;
-use graphics::{ListVisualization,ListVisualizationWindow};
+use graphics::{ListVisualization, ListVisualizationWindow};
 
-use sort::*;
 use sort::bubblesort::*;
-use sort::selectionsort::*;
 use sort::quicksort::*;
 use sort::quicksort2::*;
+use sort::selectionsort::*;
+use sort::*;
 
 const WIDTH: usize = 800;
 const HEIGHT: usize = 600;
 const MARGIN: usize = 2;
 
-fn parse_args(args: Vec<String>) -> Result<(fn(&mut List<u32>),Vec<u32>),&'static str> {
+fn parse_args(args: Vec<String>) -> Result<(fn(&mut List<u32>), Vec<u32>), &'static str> {
     // Select sorting algorithm
     let sort_fn = match args.get(1) {
         Some(arg) => match arg.as_str() {
@@ -29,7 +29,7 @@ fn parse_args(args: Vec<String>) -> Result<(fn(&mut List<u32>),Vec<u32>),&'stati
             "quicksort" => quicksort,
             "quicksort2" => quicksort2,
             _ => return Err("Unknown sorting algorithm in first parameter"),
-        }
+        },
         None => return Err("Missing first parameter: Sorting algorithm"),
     };
     // Generate data
@@ -57,7 +57,7 @@ fn main() {
         Ok((func, dat)) => {
             sort_fn = func;
             data = dat;
-        },
+        }
         Err(msg) => {
             panic!(format!("Error parsing arguments -> {}", msg));
         }

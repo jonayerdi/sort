@@ -1,19 +1,19 @@
 pub mod bubblesort;
-pub mod selectionsort;
+pub mod heapsort;
 pub mod quicksort;
 pub mod quicksort2;
+pub mod selectionsort;
 pub mod shellsort;
-pub mod heapsort;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum Operation {
     Get(usize),
     Set(usize),
-    Compare(usize,usize),
-    Swap(usize,usize),
+    Compare(usize, usize),
+    Swap(usize, usize),
 }
 impl std::fmt::Display for Operation {
-    fn fmt (&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match self {
             Operation::Get(index) => write!(f, "Get[{}]", index),
             Operation::Set(index) => write!(f, "Set[{}]", index),
@@ -23,23 +23,25 @@ impl std::fmt::Display for Operation {
     }
 }
 impl std::fmt::Debug for Operation {
-    fn fmt (&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         write!(f, "{}", self)
     }
 }
 
-pub trait List<T> 
-where T: Copy + Ord 
+pub trait List<T>
+where
+    T: Copy + Ord,
 {
     fn len(&self) -> usize;
     fn get(&self, index: usize) -> T;
     fn set(&mut self, index: usize, value: T);
-    fn compare(&self, a: usize, b: usize)  -> std::cmp::Ordering;
+    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering;
     fn swap(&mut self, a: usize, b: usize);
 }
 
 impl<T> List<T> for Vec<T>
-where T: Copy + Ord
+where
+    T: Copy + Ord,
 {
     fn len(&self) -> usize {
         self.len()
@@ -65,21 +67,27 @@ where T: Copy + Ord
     }
 }
 
-pub struct CallbackList<'a,'b,T>
-where T: Copy + Ord
+pub struct CallbackList<'a, 'b, T>
+where
+    T: Copy + Ord,
 {
     pub slice: &'a mut [T],
-    pub callback: Box<Fn(Operation,&[T]) + 'b>,
+    pub callback: Box<Fn(Operation, &[T]) + 'b>,
 }
-impl<'a,'b,T> CallbackList<'a,'b,T>
-where T: Copy + Ord
+impl<'a, 'b, T> CallbackList<'a, 'b, T>
+where
+    T: Copy + Ord,
 {
-    pub fn new(slice: &'a mut [T], callback: Box<Fn(Operation,&[T]) + 'b>) -> CallbackList<'a,'b,T> {
+    pub fn new(
+        slice: &'a mut [T],
+        callback: Box<Fn(Operation, &[T]) + 'b>,
+    ) -> CallbackList<'a, 'b, T> {
         CallbackList { slice, callback }
     }
 }
-impl<'a,'b,T> List<T> for CallbackList<'a,'b,T>
-where T: Copy + Ord
+impl<'a, 'b, T> List<T> for CallbackList<'a, 'b, T>
+where
+    T: Copy + Ord,
 {
     fn len(&self) -> usize {
         self.slice.len()
@@ -93,14 +101,13 @@ where T: Copy + Ord
         self.slice[index] = value;
         (self.callback)(Operation::Set(index), self.slice);
     }
-    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering
-    {
+    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering {
         let result = self.slice[a].cmp(&self.slice[b]);
-        (self.callback)(Operation::Compare(a,b), self.slice);
+        (self.callback)(Operation::Compare(a, b), self.slice);
         result
     }
     fn swap(&mut self, a: usize, b: usize) {
         self.slice.swap(a, b);
-        (self.callback)(Operation::Swap(a,b), self.slice);
+        (self.callback)(Operation::Swap(a, b), self.slice);
     }
 }
