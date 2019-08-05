@@ -12,7 +12,7 @@ use std::time::Duration;
 pub fn play<T, F>(sort_fn: F, data: Vec<T>, window: ListVisualizationWindow<T>)
 where
     T: 'static + Copy + Ord + Into<f64> + Send + std::fmt::Display,
-    F: 'static + Fn(&mut List<T>) + Send,
+    F: 'static + FnOnce(&mut List<T>) + Send,
 {
     // Make update channel for Window
     let channel = window.make_update_channel();
