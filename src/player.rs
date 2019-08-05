@@ -1,5 +1,3 @@
-extern crate sort;
-
 use sort::{CallbackList, List, Operation};
 
 use crate::graphics::*;
