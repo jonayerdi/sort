@@ -108,6 +108,11 @@ where T: Copy + Ord + Into<f64> + std::fmt::Display
         }
     }
     pub fn update(&mut self, changes: Vec<ListUpdate<T>>) -> minifb::Result<()> {
+        // If there are no changes, just run self.window.update()
+        if changes.is_empty() && self.revert_changes.is_empty() {
+            self.window.update();
+            return Ok(());
+        }
         // Alloc new buffer for changes to revert later
         let mut revert_changes_previous = Vec::with_capacity(4);
         std::mem::swap(&mut revert_changes_previous, &mut self.revert_changes);
@@ -147,7 +152,7 @@ where T: Copy + Ord + Into<f64> + std::fmt::Display
             if elapsed < refresh_period {
                 sleep(refresh_period - elapsed);
             }
-            println!("{}", elapsed.subsec_millis());
+            //println!("{}", elapsed.subsec_millis());
         }
     }
     pub fn make_update_channel(&self) -> SyncSender<Vec<ListUpdate<T>>> {
