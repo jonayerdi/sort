@@ -1,5 +1,3 @@
-use std::process;
-
 use rand::prelude::*;
 use clap::{Arg,App};
 
@@ -22,7 +20,7 @@ const MARGIN: usize = 2;
 macro_rules! error {
     ($($arg:tt)*) => ({
         eprintln!($($arg)*);
-        process::exit(1);
+        std::process::exit(1);
     })
 }
 
