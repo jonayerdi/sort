@@ -118,13 +118,16 @@ where
         )
         .unwrap();
         let channel = sync_channel(8); // Arbitrary buffer size
-        ListVisualizationWindow {
+        let mut visualization_window = ListVisualizationWindow {
             window,
             channel,
             framebuffer: vec![0; visualization.width * visualization.height],
             visualization,
             revert_changes: Vec::with_capacity(4),
-        }
+        };
+        visualization_window.window
+            .update_with_buffer(&visualization_window.framebuffer).unwrap();
+        visualization_window
     }
     pub fn update(&mut self, changes: Vec<ListUpdate<T>>) -> minifb::Result<()> {
         // If there are no changes, just run self.window.update()
