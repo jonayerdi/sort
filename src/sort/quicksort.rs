@@ -117,7 +117,9 @@ where
     T: Copy + Ord + std::fmt::Display,
 {
     let length = list.len();
-    real_quicksort(list, 0, length - 1);
+    if length > 1 {
+        real_quicksort(list, 0, length - 1);
+    }
 }
 
 #[cfg(test)]
