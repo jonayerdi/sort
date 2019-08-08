@@ -36,15 +36,7 @@ where
         // Call sort function
         sort_fn(&mut list);
         // Display ending animation
-        data.iter().enumerate().for_each(move |(i, &e)| {
-            channel
-                .send(vec![ListUpdate {
-                    index: i,
-                    value: e,
-                    color: COLOR_DONE,
-                }])
-                .unwrap();
-        });
+        ending_animation(&data, &channel);
     });
     // Execute window loop
     window.update_loop(Duration::from_millis(10));
@@ -96,4 +88,36 @@ where
             })
             .unwrap();
     })
+}
+
+fn ending_animation<T>(
+    data: &Vec<T>,
+    channel: &SyncSender<Vec<ListUpdate<T>>>,
+) 
+where
+    T: Copy + Ord + Into<f64> + Send + std::fmt::Display,
+{
+    let mut previous = None;
+    data.iter().enumerate().for_each(move |(index, &value)| {
+        // Select color: Different color if previous_value > value
+        let color = if let Some(previous_value) = previous {
+            if previous_value > value {
+                COLOR_DONE_ERROR
+            } else {
+                COLOR_DONE_OK
+            }
+        } else {
+            COLOR_DONE_OK
+        };
+        // Send update
+        channel
+            .send(vec![ListUpdate {
+                index,
+                value,
+                color,
+            }])
+            .unwrap();
+        // Store previous value
+        previous = Some(value);
+    });
 }
