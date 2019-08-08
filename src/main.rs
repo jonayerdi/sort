@@ -37,10 +37,15 @@ fn get_sort_fn(name: &str) -> Option<fn(&mut List<u32>)> {
 
 fn get_data_from_file(filename: &str) -> Vec<u32> {
     use std::fs::File;
+    use std::io::stdin;
     use std::io::prelude::*;
     let mut data = Vec::with_capacity(16); // Arbitrary initial capacity
-    let mut file = File::open(filename)
-        .unwrap_or_else(|_| error!("Cannot open data file \"{}\"", filename));
+    let mut file: Box<Read> = if filename == "." {
+        Box::new(stdin())
+    } else {
+        Box::new(File::open(filename)
+            .unwrap_or_else(|_| error!("Cannot open data file \"{}\"", filename)))
+    };
     let mut contents = String::new();
     file.read_to_string(&mut contents)
         .unwrap_or_else(|_| error!("Cannot read data file \"{}\" as UTF-8 text", filename));
@@ -84,7 +89,7 @@ fn parse_args() -> (fn(&mut List<u32>), Vec<u32>) {
             .short("f")
             .long("file")
             .value_name("FILE")
-            .help("File containing the data to be sorted")
+            .help("File containing the data to be sorted. Use \".\" as a filename to read from stdin")
             .required(false))
         .arg(Arg::with_name("rand")
             .short("r")
