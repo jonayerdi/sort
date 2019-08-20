@@ -25,7 +25,7 @@ macro_rules! error {
     })
 }
 
-fn get_sort_fn(name: &str) -> Option<fn(&mut List<u32>)> {
+fn get_sort_fn(name: &str) -> Option<fn(&mut dyn List<u32>)> {
     match name {
         "bubblesort" => Some(bubblesort),
         "selectionsort" => Some(selectionsort),
@@ -40,7 +40,7 @@ fn get_data_from_file(filename: &str) -> Vec<u32> {
     use std::io::stdin;
     use std::io::prelude::*;
     let mut data = Vec::with_capacity(16); // Arbitrary initial capacity
-    let mut file: Box<Read> = if filename == "." {
+    let mut file: Box<dyn Read> = if filename == "." {
         Box::new(stdin())
     } else {
         Box::new(File::open(filename)
@@ -74,7 +74,7 @@ fn get_random_data(count: usize) -> Vec<u32> {
     data
 }
 
-fn parse_args() -> (fn(&mut List<u32>), Vec<u32>) {
+fn parse_args() -> (fn(&mut dyn List<u32>), Vec<u32>) {
     let matches = App::new("Sort GUI")
         .version("0.1.0")
         .author("Jon Ayerdi")

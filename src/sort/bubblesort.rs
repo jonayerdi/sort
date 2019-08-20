@@ -1,7 +1,7 @@
 use super::List;
 use std::cmp::Ordering;
 
-pub fn bubblesort<T>(list: &mut List<T>)
+pub fn bubblesort<T>(list: &mut dyn List<T>)
 where
     T: Copy + Ord + std::fmt::Display,
 {

@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 
 use rand::prelude::*;
 
-fn relocate_pivot_right<T>(list: &mut List<T>, pivot: usize, right: usize) -> usize
+fn relocate_pivot_right<T>(list: &mut dyn List<T>, pivot: usize, right: usize) -> usize
 where
     T: Copy + Ord + std::fmt::Display,
 {
@@ -26,7 +26,7 @@ where
     pivot
 }
 
-fn relocate_pivot_left<T>(list: &mut List<T>, left: usize, pivot: usize) -> usize
+fn relocate_pivot_left<T>(list: &mut dyn List<T>, left: usize, pivot: usize) -> usize
 where
     T: Copy + Ord + std::fmt::Display,
 {
@@ -49,7 +49,7 @@ where
     pivot
 }
 
-fn swap_from_sides<T>(list: &mut List<T>, begin: usize, pivot: usize, end: usize) -> usize
+fn swap_from_sides<T>(list: &mut dyn List<T>, begin: usize, pivot: usize, end: usize) -> usize
 where
     T: Copy + Ord + std::fmt::Display,
 {
@@ -72,7 +72,7 @@ where
     }
 }
 
-fn partition<T>(list: &mut List<T>, begin: usize, end: usize) -> usize
+fn partition<T>(list: &mut dyn List<T>, begin: usize, end: usize) -> usize
 where
     T: Copy + Ord + std::fmt::Display,
 {
@@ -87,7 +87,7 @@ where
     }
 }
 
-fn real_quicksort<T>(list: &mut List<T>, begin: usize, end: usize)
+fn real_quicksort<T>(list: &mut dyn List<T>, begin: usize, end: usize)
 where
     T: Copy + Ord + std::fmt::Display,
 {
@@ -112,7 +112,7 @@ where
     }
 }
 
-pub fn quicksort<T>(list: &mut List<T>)
+pub fn quicksort<T>(list: &mut dyn List<T>)
 where
     T: Copy + Ord + std::fmt::Display,
 {

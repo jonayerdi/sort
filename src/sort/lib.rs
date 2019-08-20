@@ -72,7 +72,7 @@ where
     T: Copy + Ord,
 {
     pub slice: &'a mut [T],
-    pub callback: Box<Fn(Operation, &[T]) + 'b>,
+    pub callback: Box<dyn 'b + Fn(Operation, &[T])>,
 }
 impl<'a, 'b, T> CallbackList<'a, 'b, T>
 where
@@ -80,7 +80,7 @@ where
 {
     pub fn new(
         slice: &'a mut [T],
-        callback: Box<Fn(Operation, &[T]) + 'b>,
+        callback: Box<dyn 'b + Fn(Operation, &[T])>,
     ) -> CallbackList<'a, 'b, T> {
         CallbackList { slice, callback }
     }
