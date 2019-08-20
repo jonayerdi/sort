@@ -8,12 +8,12 @@ use std::time::{Duration, Instant};
 
 use minifb::{Window, WindowOptions};
 
-pub const COLOR_BACKGROUND: u32 = 0xFF111111;
-pub const COLOR_FILL: u32 = 0xFFAAAAAA;
-pub const COLOR_DONE_OK: u32 = 0xFF00AA22;
-pub const COLOR_DONE_ERROR: u32 = 0xFFAA0022;
-pub const COLOR_READ: u32 = 0xFF009999;
-pub const COLOR_WRITE: u32 = 0xFF990099;
+pub const COLOR_BACKGROUND: u32 = 0xFF11_1111;
+pub const COLOR_FILL: u32 = 0xFFAA_AAAA;
+pub const COLOR_DONE_OK: u32 = 0xFF00_AA22;
+pub const COLOR_DONE_ERROR: u32 = 0xFFAA_0022;
+pub const COLOR_READ: u32 = 0xFF00_9999;
+pub const COLOR_WRITE: u32 = 0xFF99_0099;
 
 pub struct ListVisualization<T>
 where

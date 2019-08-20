@@ -91,7 +91,7 @@ where
 }
 
 fn ending_animation<T>(
-    data: &Vec<T>,
+    data: &[T],
     channel: &SyncSender<Vec<ListUpdate<T>>>,
 ) 
 where

@@ -55,7 +55,7 @@ fn get_data_from_file(filename: &str) -> Vec<u32> {
             Ok(n) => data.push(n),
             Err(_) => {
                 // Display error only if the line contains non-whitespace characters
-                if text.chars().fold(false, |acc, c| acc || !c.is_whitespace()) {
+                if text.chars().any(|c| !c.is_whitespace()) {
                     error!("Cannot parse \"{}:{}\" as unsigned integer", filename, line + 1)
                 }
             },

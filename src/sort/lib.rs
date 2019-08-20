@@ -33,6 +33,7 @@ where
     T: Copy + Ord,
 {
     fn len(&self) -> usize;
+    fn is_empty(&self) -> bool { self.len() == 0 }
     fn get(&self, index: usize) -> T;
     fn set(&mut self, index: usize, value: T);
     fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering;
