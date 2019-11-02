@@ -5,6 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(LLDB) Launch",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/target/debug/sortgui",
+            "args": [
+                "--sort",
+                "quicksort2",
+                "--file",
+                "data.txt"
+            ],
+            "cwd": "${workspaceRoot}",
+        },
+        {
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",

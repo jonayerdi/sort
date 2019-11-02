@@ -133,8 +133,8 @@ where
     pub fn update(&mut self, changes: Vec<ListUpdate<T>>) -> minifb::Result<()> {
         // If there are no changes, just run self.window.update()
         if changes.is_empty() && self.revert_changes.is_empty() {
-            self.window.update();
-            return Ok(());
+            // Just doing self.window.update() does not keep refreshing the window on Linux X11 :(
+            return self.window.update_with_buffer(&self.framebuffer);
         }
         // Alloc new buffer for changes to revert later
         let mut revert_changes_previous = Vec::with_capacity(4);
