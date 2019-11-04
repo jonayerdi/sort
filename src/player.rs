@@ -90,10 +90,7 @@ where
     })
 }
 
-fn ending_animation<T>(
-    data: &[T],
-    channel: &SyncSender<Vec<ListUpdate<T>>>,
-) 
+fn ending_animation<T>(data: &[T], channel: &SyncSender<Vec<ListUpdate<T>>>)
 where
     T: Copy + Ord + Into<f64> + Send + std::fmt::Display,
 {

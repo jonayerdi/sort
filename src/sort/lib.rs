@@ -34,12 +34,24 @@ where
 {
     fn as_slice(&self) -> &[T];
     fn as_mut_slice(&mut self) -> &mut [T];
-    fn len(&self) -> usize { self.as_slice().len() }
-    fn is_empty(&self) -> bool { self.len() == 0 }
-    fn get(&self, index: usize) -> T { self.as_slice()[index] }
-    fn set(&mut self, index: usize, value: T) { self.as_mut_slice()[index] = value; }
-    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering { self.get(a).cmp(&self.get(b)) }
-    fn swap(&mut self, a: usize, b: usize) { self.as_mut_slice().swap(a, b); }
+    fn len(&self) -> usize {
+        self.as_slice().len()
+    }
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+    fn get(&self, index: usize) -> T {
+        self.as_slice()[index]
+    }
+    fn set(&mut self, index: usize, value: T) {
+        self.as_mut_slice()[index] = value;
+    }
+    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering {
+        self.get(a).cmp(&self.get(b))
+    }
+    fn swap(&mut self, a: usize, b: usize) {
+        self.as_mut_slice().swap(a, b);
+    }
 }
 
 impl<T> List<T> for Vec<T>

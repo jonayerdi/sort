@@ -1,5 +1,5 @@
+use clap::{App, Arg, ArgGroup};
 use rand::prelude::*;
-use clap::{Arg,App,ArgGroup};
 
 mod player;
 use player::play;
@@ -37,14 +37,16 @@ fn get_sort_fn(name: &str) -> Option<fn(&mut dyn List<u32>)> {
 
 fn get_data_from_file(filename: &str) -> Vec<u32> {
     use std::fs::File;
-    use std::io::stdin;
     use std::io::prelude::*;
+    use std::io::stdin;
     let mut data = Vec::with_capacity(16); // Arbitrary initial capacity
     let mut file: Box<dyn Read> = if filename == "." {
         Box::new(stdin())
     } else {
-        Box::new(File::open(filename)
-            .unwrap_or_else(|_| error!("Cannot open data file \"{}\"", filename)))
+        Box::new(
+            File::open(filename)
+                .unwrap_or_else(|_| error!("Cannot open data file \"{}\"", filename)),
+        )
     };
     let mut contents = String::new();
     file.read_to_string(&mut contents)
@@ -56,9 +58,13 @@ fn get_data_from_file(filename: &str) -> Vec<u32> {
             Err(_) => {
                 // Display error only if the line contains non-whitespace characters
                 if text.chars().any(|c| !c.is_whitespace()) {
-                    error!("Cannot parse \"{}:{}\" as unsigned integer", filename, line + 1)
+                    error!(
+                        "Cannot parse \"{}:{}\" as unsigned integer",
+                        filename,
+                        line + 1
+                    )
                 }
-            },
+            }
         };
     });
     data.shrink_to_fit();
@@ -109,18 +115,17 @@ fn parse_args() -> (fn(&mut dyn List<u32>), Vec<u32>) {
         None => error!("Sorting function \"{}\" not found", sort_fn_str),
     };
     // Get data
-    let data = 
-        if let Some(filename) = matches.value_of("file") {
-            get_data_from_file(filename)
-        } else {
-            // unwrap() should be safe because <file|rand> is mandatory
-            let rand_count_str = matches.value_of("rand").unwrap();
-            let rand_count = match rand_count_str.parse::<usize>() {
-                Ok(n) => n,
-                Err(_) => error!("Cannot parse \"{}\" as unsigned integer", rand_count_str),
-            };
-            get_random_data(rand_count)
+    let data = if let Some(filename) = matches.value_of("file") {
+        get_data_from_file(filename)
+    } else {
+        // unwrap() should be safe because <file|rand> is mandatory
+        let rand_count_str = matches.value_of("rand").unwrap();
+        let rand_count = match rand_count_str.parse::<usize>() {
+            Ok(n) => n,
+            Err(_) => error!("Cannot parse \"{}\" as unsigned integer", rand_count_str),
         };
+        get_random_data(rand_count)
+    };
     (sort_fn, data)
 }
 
