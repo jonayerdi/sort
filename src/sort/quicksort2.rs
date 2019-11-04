@@ -33,24 +33,44 @@ where
     pivot - count
 }
 
-fn swap_from_sides<T>(list: &mut dyn List<T>, begin: usize, pivot: usize, end: usize) -> usize
+fn swap_from_sides<T>(
+    list: &mut dyn List<T>,
+    begin: usize,
+    pivot: usize,
+    end: usize,
+    eqswaps: isize,
+) -> usize
 where
     T: Copy + Ord + std::fmt::Display,
 {
+    let mut eqswaps = eqswaps;
     let mut left = begin;
     let mut right = end;
+    let mut order;
     loop {
-        while list.compare(left, pivot) != Ordering::Greater {
+        order = list.compare(left, pivot);
+        while order != Ordering::Greater {
             if left == pivot {
                 return right;
             }
+            if eqswaps < 0 && order == Ordering::Equal {
+                eqswaps += 1;
+                break;
+            }
             left += 1;
+            order = list.compare(left, pivot);
         }
-        while list.compare(pivot, right) != Ordering::Greater {
+        order = list.compare(pivot, right);
+        while order != Ordering::Greater {
             if right == pivot {
                 return left;
             }
+            if eqswaps > 0 && order == Ordering::Equal {
+                eqswaps -= 1;
+                break;
+            }
             right -= 1;
+            order = list.compare(pivot, right);
         }
         list.swap(left, right);
     }
@@ -62,7 +82,7 @@ where
 {
     let pivot = (random::<usize>() % (end + 1 - begin)) + begin;
     // Swap large elements to the left with small ones to the right
-    let remaining = swap_from_sides(list, begin, pivot, end);
+    let remaining = swap_from_sides(list, begin, pivot, end, 0);
     // Calculate final position of pivot element
     let (left, new_pivot, right) = if remaining < pivot {
         let new_pivot = relocate_pivot_left(list, remaining, pivot);
@@ -73,8 +93,17 @@ where
     };
     // Reposition pivot
     list.swap(pivot, new_pivot);
-    // Swap remaining element to the correct side
-    swap_from_sides(list, left, new_pivot, right);
+    // Count the number of elements equal to the pivot that must be swapped
+    let eqswaps = list.as_slice()[left..new_pivot]
+        .iter()
+        .filter(|e| list.get(new_pivot).cmp(e) == Ordering::Less)
+        .count() as isize
+        - list.as_slice()[new_pivot + 1..=right]
+            .iter()
+            .filter(|e| list.get(new_pivot).cmp(e) == Ordering::Greater)
+            .count() as isize;
+    // Swap remaining elements to the correct side
+    swap_from_sides(list, left, new_pivot, right, eqswaps);
     // Return final pivot position
     new_pivot
 }
