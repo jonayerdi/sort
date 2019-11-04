@@ -32,39 +32,25 @@ pub trait List<T>
 where
     T: Copy + Ord,
 {
-    fn len(&self) -> usize;
+    fn as_slice(&self) -> &[T];
+    fn as_mut_slice(&mut self) -> &mut [T];
+    fn len(&self) -> usize { self.as_slice().len() }
     fn is_empty(&self) -> bool { self.len() == 0 }
-    fn get(&self, index: usize) -> T;
-    fn set(&mut self, index: usize, value: T);
-    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering;
-    fn swap(&mut self, a: usize, b: usize);
+    fn get(&self, index: usize) -> T { self.as_slice()[index] }
+    fn set(&mut self, index: usize, value: T) { self.as_mut_slice()[index] = value; }
+    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering { self.get(a).cmp(&self.get(b)) }
+    fn swap(&mut self, a: usize, b: usize) { self.as_mut_slice().swap(a, b); }
 }
 
 impl<T> List<T> for Vec<T>
 where
     T: Copy + Ord,
 {
-    fn len(&self) -> usize {
-        self.len()
+    fn as_slice(&self) -> &[T] {
+        self
     }
-    fn get(&self, index: usize) -> T {
-        self[index]
-    }
-    fn set(&mut self, index: usize, value: T) {
-        self[index] = value;
-    }
-    fn compare(&self, a: usize, b: usize) -> std::cmp::Ordering {
-        self[a].cmp(&self[b])
-    }
-    fn swap(&mut self, a: usize, b: usize) {
-        // Copypasted from Vec::swap
-        unsafe {
-            // Can't take two mutable loans from one vector, so instead just cast
-            // them to their raw pointers to do the swap
-            let pa: *mut T = &mut self[a];
-            let pb: *mut T = &mut self[b];
-            std::ptr::swap(pa, pb);
-        }
+    fn as_mut_slice(&mut self) -> &mut [T] {
+        self
     }
 }
 
@@ -90,8 +76,11 @@ impl<'a, 'b, T> List<T> for CallbackList<'a, 'b, T>
 where
     T: Copy + Ord,
 {
-    fn len(&self) -> usize {
-        self.slice.len()
+    fn as_slice(&self) -> &[T] {
+        self.slice
+    }
+    fn as_mut_slice(&mut self) -> &mut [T] {
+        self.slice
     }
     fn get(&self, index: usize) -> T {
         let result = self.slice[index];

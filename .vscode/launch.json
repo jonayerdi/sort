@@ -18,6 +18,15 @@
             "cwd": "${workspaceRoot}",
         },
         {
+            "name": "(LLDB) Test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/target/debug/deps/sort-217a361a619f8e33",
+            "args": [
+            ],
+            "cwd": "${workspaceRoot}",
+        },
+        {
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
