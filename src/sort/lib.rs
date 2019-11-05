@@ -6,6 +6,13 @@ pub mod quicksort2;
 pub mod selectionsort;
 pub mod shellsort;
 
+pub use bubblesort::*;
+pub use insertionsort::*;
+pub use quicksort::*;
+pub use quicksort2::*;
+pub use selectionsort::*;
+pub use shellsort::*;
+
 #[derive(Copy, Clone, PartialEq)]
 pub enum Operation {
     Get(usize),

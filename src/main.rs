@@ -7,11 +7,6 @@ use player::play;
 mod graphics;
 use graphics::{ListVisualization, ListVisualizationWindow};
 
-use sort::bubblesort::*;
-use sort::insertionsort::*;
-use sort::quicksort::*;
-use sort::quicksort2::*;
-use sort::selectionsort::*;
 use sort::*;
 
 const WIDTH: usize = 800;
@@ -31,6 +26,7 @@ fn get_sort_fn(name: &str) -> Option<fn(&mut dyn List<u32>)> {
         "bubblesort" => Some(bubblesort),
         "insertionsort" => Some(insertionsort),
         "selectionsort" => Some(selectionsort),
+        "shellsort" => Some(shellsort),
         "quicksort" => Some(quicksort),
         "quicksort2" => Some(quicksort2),
         _ => None,
