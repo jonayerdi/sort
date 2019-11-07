@@ -78,7 +78,7 @@ fn get_random_data(count: usize) -> Vec<u32> {
     data
 }
 
-fn parse_args() -> (fn(&mut dyn List<u32>), Vec<u32>) {
+fn parse_args() -> (String, fn(&mut dyn List<u32>), Vec<u32>) {
     let matches = App::new("Sort GUI")
         .version("0.1.0")
         .author("Jon Ayerdi")
@@ -107,10 +107,10 @@ fn parse_args() -> (fn(&mut dyn List<u32>), Vec<u32>) {
             .required(true))
         .get_matches();
     // Get sort_fn
-    let sort_fn_str = matches.value_of("sort").unwrap();
-    let sort_fn = match get_sort_fn(sort_fn_str) {
+    let sort_fn_name = matches.value_of("sort").unwrap();
+    let sort_fn = match get_sort_fn(sort_fn_name) {
         Some(fptr) => fptr,
-        None => error!("Sorting function \"{}\" not found", sort_fn_str),
+        None => error!("Sorting function \"{}\" not found", sort_fn_name),
     };
     // Get data
     let data = if let Some(filename) = matches.value_of("file") {
@@ -124,15 +124,15 @@ fn parse_args() -> (fn(&mut dyn List<u32>), Vec<u32>) {
         };
         get_random_data(rand_count)
     };
-    (sort_fn, data)
+    (String::from(sort_fn_name), sort_fn, data)
 }
 
 fn main() {
     // Parse args
-    let (sort_fn, data) = parse_args();
+    let (sort_fn_name, sort_fn, data) = parse_args();
     // Init
     let visualization = ListVisualization::autogenerate(&data, WIDTH, HEIGHT, MARGIN);
-    let window = ListVisualizationWindow::new(visualization);
+    let window = ListVisualizationWindow::new(&sort_fn_name, visualization);
     // Run
     play(sort_fn, data, window);
 }

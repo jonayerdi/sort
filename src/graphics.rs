@@ -110,9 +110,9 @@ impl<T> ListVisualizationWindow<T>
 where
     T: Copy + Ord + Into<f64> + std::fmt::Display,
 {
-    pub fn new(visualization: ListVisualization<T>) -> ListVisualizationWindow<T> {
+    pub fn new(title: &str, visualization: ListVisualization<T>) -> ListVisualizationWindow<T> {
         let window = Window::new(
-            "Sort GUI",
+            title,
             visualization.width,
             visualization.height,
             WindowOptions::default(),
