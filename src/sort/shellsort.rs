@@ -1,5 +1,4 @@
 use super::List;
-use std::cmp::Ordering;
 
 struct TokudaIterator {
     max_value: usize,
@@ -37,7 +36,15 @@ where
     T: Copy + Ord + std::fmt::Display,
 {
     for gap in gaps_sequence(list.len() - 1) {
-
+        for i in gap..list.len() {
+            let temp = list.get(i);
+            let mut j = i;
+            while j >= gap && list.get(j - gap) > temp {
+                list.set(j, list.get(j - gap));
+                j -= gap;
+            }
+            list.set(j, temp);
+        }
     }
 }
 
